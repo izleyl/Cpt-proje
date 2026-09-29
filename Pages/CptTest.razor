@@ -1,0 +1,374 @@
+﻿@page "/test"
+@layout BosLayout
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="test-container">
+    @if (ekranDurumu == "Hazir")
+    {
+        <div class="ready-card" style="max-width: 600px; text-align: center;">
+            <div class="break-badge">Klinik Değerlendirme Modülü</div>
+            <h2>Bilgisayarlı Dikkat Testi (CPT)</h2>
+            <p style="text-align: center; margin-top: 15px; line-height: 1.6; color: #c9d1d9;">
+                Bu test; dikkat sürenizi, dürtü kontrolünüzü, bölünmüş dikkat becerinizi ve zihinsel esnekliğinizi ölçmek amacıyla <strong>5 farklı aşamadan</strong> oluşacak şekilde tasarlanmıştır.
+            </p>
+            <p style="text-align: center; margin-top: 10px; line-height: 1.6; color: #c9d1d9;">
+                Her aşama öncesinde ekranda size özel kurallar gösterilecektir. Yanıt vermek için klavyedeki <strong>SPACE (Boşluk)</strong> tuşunu kullanmanız gerekmektedir.
+            </p>
+            <button class="btn-action mt-3" @onclick="MolaVeyaBaslangicGoster">Test Yönergesine Geç</button>
+        </div>
+    }
+    else if (ekranDurumu == "Mola")
+    {
+        <div class="break-card">
+            <div class="break-badge">Aşama @aktifBlok / 5</div>
+            <h2>
+                @if (aktifBlok == 1)
+                {
+                    <span>Blok 1: Temel Seçici Dikkat</span>
+                }
+                else if (aktifBlok == 2)
+                {
+                    <span>Blok 2: Dürtüsellik (Go / No-Go)</span>
+                }
+                else if (aktifBlok == 3)
+                {
+                    <span>Blok 3: Sürdürülebilir Dikkat (Vigilance)</span>
+                }
+                else if (aktifBlok == 4)
+                {
+                    <span>Blok 4: Bölünmüş Dikkat (Çeldiriciler)</span>
+                }
+                else if (aktifBlok == 5)
+                {
+                    <span>Blok 5: Zihinsel Esneklik (Set-Shifting)</span>
+                }
+            </h2>
+
+            <div class="rule-box">
+                @if (aktifBlok == 1)
+                {
+                    <span style="color: #2f81f7; font-size: 16px; font-weight: 600;">⭐ MAVI YILDIZ</span>
+
+                    <br />
+                    <span>Ekranda bu hedefi gördüğünüz anda <strong>SPACE (Boşluk)</strong> tuşuna basın. Diğer şekillere basmayın.</span>
+                }
+                else if (aktifBlok == 2)
+                {
+                    <span style="color: #2ea043; font-size: 16px; font-weight: 600;">🟢 YEŞİL Daire ➔ BAS</span>
+
+                    <br />
+                    <span style="color: #f85149; font-size: 16px; font-weight: 600;">🔴 KIRMIZI Daire ➔ BASMA</span>
+
+                    <br />
+                    <span style="font-size: 13px; color: #8b949e; margin-top: 8px; display: block;">Hedefler sık gelecektir, dürtülerinize hakim olun.</span>
+                }
+                else if (aktifBlok == 3)
+                {
+                    <span style="color: #2f81f7; font-size: 16px; font-weight: 600;">🔵 MAVİ Daire ➔ BAS</span>
+
+                    <br />
+                    <span style="color: #8b949e; font-size: 13px;">Diğer tüm şekil ve renklere kesinlikle basmayın. Hedefler nadir gelecektir.</span>
+                }
+                else if (aktifBlok == 4)
+                {
+                    <span style="color: #2f81f7; font-size: 16px; font-weight: 600;">⭐ MAVİ YILDIZ ➔ BAS</span>
+
+                    <br />
+                    <span style="color: #8b949e; font-size: 13px;">Arka plandaki hareketli nesnelere ve seslere aldırış etmeyin.</span>
+                }
+                else if (aktifBlok == 5)
+                {
+                    <span style="color: #2ea043; font-size: 16px; font-weight: 600;">🟢 YEŞİL Daire ➔ BAS</span>
+
+                    <br />
+                    <span style="color: #8b949e; font-size: 13px;">Test ilerledikçe kural aniden değişebilir, dikkatli olun!</span>
+                }
+            </div>
+
+            <button class="btn-action" @onclick="GeriSayimiBaslat">Blok @aktifBlok'u Başlat</button>
+        </div>
+    }
+    else if (ekranDurumu == "GeriSayim")
+    {
+        <div class="countdown-display">
+            <h1>@geriSayimDegeri</h1>
+            <p>Odaklanın, test başlıyor...</p>
+        </div>
+    }
+    else if (ekranDurumu == "Test")
+    {
+        <div class="stimulus-box">
+            <svg id="dynamicStimulus" class="stimulus" viewBox="0 0 24 24" width="140" height="140">
+                <path id="stimulusPath" d="" fill="" />
+            </svg>
+        </div>
+    }
+    else if (ekranDurumu == "Sonuc")
+    {
+        <div class="results-card">
+            <h2>Test Oturumu Tamamlandı</h2>
+            <p>Tüm bloklara ait performans verileriniz kaydedildi.</p>
+
+            <!-- EKLENEN KISIM: JS'den gelen özet sonuçları ekranda göstermek için -->
+            @if (testSonucu != null)
+            {
+                <div style="background: rgba(47, 129, 247, 0.1); border: 1px solid #2f81f7; padding: 15px; border-radius: 8px; text-align: left; margin-bottom: 20px;">
+                    <h3 style="color:#2f81f7; margin-top:0;">Sonuç Özeti</h3>
+                    <div style="color: #c9d1d9; font-size: 14px; line-height: 1.8;">
+                        <div><strong>Genel Puan:</strong> @testSonucu.GenelPuan</div>
+                        <div><strong>Odaklanma:</strong> @testSonucu.Odaklanma</div>
+                        <div><strong>Dürtü Kontrolü:</strong> @testSonucu.DurtuKontrolu</div>
+                        <div><strong>Hiperaktivite:</strong> @testSonucu.Hiperaktivite</div>
+                        <div><strong>Zihinsel Esneklik:</strong> @testSonucu.ZihinselEsneklik</div>
+                        <div><strong>İşlem Hızı:</strong> @testSonucu.IslemHizi</div>
+                    </div>
+                </div>
+            }
+
+            <div class="logs-container">
+                @foreach (var sonuc in TestSonuclari)
+                {
+                    <div class="log-row">@sonuc</div>
+                }
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    private DotNetObjectReference<CptTest>? dotnetRef;
+    public void Dispose() => dotnetRef?.Dispose();
+    public static List<string> TestSonuclari = new List<string>();
+    private static Action? EkranGuncelle;
+    private static TestSonucOzeti testSonucu = null;
+    private static string ekranDurumu = "Hazir";
+    private static int aktifBlok = 1;
+    private int geriSayimDegeri = 10;
+
+
+    protected override void OnInitialized()
+    {
+        dotnetRef = DotNetObjectReference.Create(this);
+        ekranDurumu = "Hazir";
+        aktifBlok = 1;
+        TestSonuclari.Clear();
+        EkranGuncelle = StateHasChanged;
+    }
+
+    private void MolaVeyaBaslangicGoster()
+    {
+        ekranDurumu = "Mola";
+        StateHasChanged();
+    }
+
+    private async Task GeriSayimiBaslat()
+    {
+        await JS.InvokeVoidAsync("cptInterop.baglan", dotnetRef);
+        ekranDurumu = "GeriSayim";
+        StateHasChanged();
+
+        for (int i = 10; i > 0; i--)
+        {
+            geriSayimDegeri = i;
+            StateHasChanged();
+            await Task.Delay(1000);
+        }
+
+        ekranDurumu = "Test";
+        StateHasChanged();
+        await Task.Delay(500);
+
+        if (aktifBlok == 1) { await JS.InvokeVoidAsync("cptInterop.testMotoruBaslat"); }
+        else if (aktifBlok == 2) { await JS.InvokeVoidAsync("cptInterop.testMotoruBaslatBlok2"); }
+        else if (aktifBlok == 3) { await JS.InvokeVoidAsync("cptInterop.testMotoruBaslatBlok3"); }
+        else if (aktifBlok == 4) { await JS.InvokeVoidAsync("cptInterop.testMotoruBaslatBlok4"); }
+        else if (aktifBlok == 5) { await JS.InvokeVoidAsync("cptInterop.testMotoruBaslatBlok5"); }
+    }
+
+    [JSInvokable("CptVeriKaydet")]
+    public void CptVeriKaydet(string outcome, string sekilTipi, double? tepkiSuresi)
+    {
+        string sekilMetni = string.IsNullOrEmpty(sekilTipi) ? "Yok" : sekilTipi;
+        string blokEtiketi = $"[BLOK {aktifBlok}]";
+
+        string logMesaji = $"{blokEtiketi} Sonuç: {outcome,-15} | Şekil: {sekilMetni}";
+        if (tepkiSuresi.HasValue)
+        {
+            logMesaji += $" | RT: {Math.Round(tepkiSuresi.Value)} ms";
+        }
+        TestSonuclari.Add(logMesaji);
+    }
+
+    [JSInvokable("TestBitti")]
+    public static void TestBitti()
+    {
+        if (aktifBlok < 5)
+        {
+            aktifBlok++;
+            ekranDurumu = "Mola"; // Sonraki bloğun yönerge kartına atar
+        }
+        else
+        {
+            ekranDurumu = "Sonuc";
+        }
+        EkranGuncelle?.Invoke();
+    }
+    // ... 204. satırdaki TestBitti() metodunun kapanış parantezi }
+    public class TestSonucOzeti
+    {
+        public string Odaklanma { get; set; }
+        public string DurtuKontrolu { get; set; }
+        public string Hiperaktivite { get; set; }
+        public string ZihinselEsneklik { get; set; }
+        public string IslemHizi { get; set; }
+        public string GenelPuan { get; set; }
+    }
+
+    [JSInvokable("SonuclariEkrandaGoster")]
+    public static void SonuclariEkrandaGoster(TestSonucOzeti sonuc)
+    {
+        testSonucu = sonuc; // JS'den gelen veriyi Blazor'a kaydet
+        EkranGuncelle?.Invoke(); // Ekranı yenileyip HTML'i tetikle
+    }
+
+    // ... 205. satırdaki son kapanış parantezi }
+}
+
+<style>
+    .test-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        color: #e6edf3;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .ready-card, .break-card, .results-card {
+        background: rgba(18, 22, 29, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 40px;
+        border-radius: 16px;
+        text-align: center;
+        max-width: 520px;
+        width: 100%;
+        box-shadow: 0 16px 32px rgba(0,0,0,0.6);
+    }
+
+        .ready-card h2, .break-card h2, .results-card h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .ready-card p, .break-card p, .results-card p {
+            font-size: 13px;
+            color: #8b949e;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+    .btn-action {
+        background: #2f81f7;
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .btn-action:hover {
+            background: #1f6feb;
+        }
+
+    .countdown-display {
+        text-align: center;
+    }
+
+        .countdown-display h1 {
+            font-size: 120px;
+            font-weight: 800;
+            color: #2f81f7;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .countdown-display p {
+            color: #8b949e;
+            font-size: 14px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+    .stimulus-box {
+        width: 750px;
+        height: 480px;
+        border: none;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stimulus {
+        position: absolute;
+        visibility: hidden;
+    }
+
+    .break-badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #e3b341;
+        background: rgba(227, 179, 65, 0.1);
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+    }
+
+    .rule-box {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        margin-bottom: 24px;
+        line-height: 1.6;
+        text-align: left;
+    }
+
+    .logs-container {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        max-height: 280px;
+        overflow-y: auto;
+        padding: 12px;
+        text-align: left;
+        margin-top: 16px;
+        margin-top: 16px;
+    }
+
+    .log-row {
+        font-family: monospace;
+        font-size: 12px;
+        padding: 4px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        color: #8b949e;
+    }
+</style>

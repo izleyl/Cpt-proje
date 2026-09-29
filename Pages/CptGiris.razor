@@ -1,0 +1,138 @@
+﻿@page "/giris"
+@inject NavigationManager NavManager
+
+<div class="landing-wrapper">
+    <div class="glass-card">
+        <div class="badge-tag">Nöropsikolojik Değerlendirme</div>
+        <h1 class="title">Computerized Performance Test</h1>
+        <p class="subtitle">Bu test bataryası; sürdürülebilir dikkat, dürtüsellik, bölünmüş dikkat ve zihinsel esneklik becerilerinizi ölçmek için tasarlanmıştır.</p>
+
+        <div class="instructions-box">
+            <div class="instruction-item">
+                <span class="step-num">i</span>
+                <span>Test toplam 5 farklı aşamadan (bloktan) oluşur. Her aşama öncesinde kural bilgisi verilecektir.</span>
+            </div>
+            <div class="instruction-item">
+                <span class="step-num">⌨</span>
+                <span>Tüm aşamalarda yanıt vermek için klavyedeki <strong>SPACE (Boşluk)</strong> tuşu kullanılır.</span>
+            </div>
+        </div>
+
+        <button class="btn-start" @onclick="TesteGit">
+            <span>Teste Git</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+        </button>
+    </div>
+</div>
+
+@code {
+    private void TesteGit()
+    {
+        NavManager.NavigateTo("/test");
+    }
+}
+
+<style>
+    .landing-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: radial-gradient(circle at 50% 20%, #1a1f2c 0%, #0d1117 100%);
+        font-family: 'Inter', system-ui, sans-serif;
+        color: #e6edf3;
+    }
+
+    .glass-card {
+        background: rgba(22, 27, 34, 0.7);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 40px;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .badge-tag {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #2f81f7;
+        background: rgba(47, 129, 247, 0.1);
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-bottom: 16px;
+    }
+
+    .title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #ffffff;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        color: #8b949e;
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+
+    .instructions-box {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .instruction-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: #c9d1d9;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .step-num {
+        font-weight: 700;
+        color: #2f81f7;
+        background: rgba(47, 129, 247, 0.15);
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .btn-start {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #2f81f7 0%, #1f6feb 100%);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(47, 129, 247, 0.3);
+    }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(47, 129, 247, 0.4);
+        }
+</style>

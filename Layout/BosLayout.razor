@@ -1,0 +1,25 @@
+﻿@inherits LayoutComponentBase
+
+<div class="klinik-siyah-ekran">
+    @Body
+</div>
+
+<style>
+    /* Tüm sayfanın arka planını zorla siyah yapar ve kaydırma çubuklarını yok eder */
+    body, html {
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: black !important;
+        overflow: hidden !important;
+    }
+
+    .klinik-siyah-ekran {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: black;
+        color: white;
+    }
+</style>
