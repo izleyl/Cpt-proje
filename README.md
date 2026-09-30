@@ -72,17 +72,6 @@ Uygulama 5 bloktan oluşur ve son bloğun bitimiyle otomatik olarak analiz ekran
 - **Çoklu Tıklama (Hyperactivity):** Gereksiz ve art arda tuşa basma durumları.
 - **Ortalama Tepki Süresi (RT):** Milisaniye cinsinden bilgi işleme hızı.
 
----
-
-## 📌 Yapılacaklar (TODO)
-
-- [ ] Kullanıcı kayıt/giriş sistemi entegrasyonu
-- [ ] Test sonuçlarının SQLite/SQL veritabanına kaydedilmesi
-- [ ] Performans verilerinin PDF raporu olarak dışa aktarılması
-- [ ] Normatif verilerle kullanıcı performansının karşılaştırılması
-
----
-
 ## 📄 Lisans
 
-Bu proje **MIT** lisansı ile lisanslanmıştır. Dilediğiniz gibi kullanabilir ve geliştirebilirsiniz.
+Bu proje **MIT** lisansı ile lisanslanmıştır.
